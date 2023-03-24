@@ -103,6 +103,10 @@ def portselector():
 ser, ser_desc = portselector()
 
 # data
+
+# bien du trang thai may do
+isCounting = False
+
 # bien giu ten tab dang chon (bang so lieu nao)
 tg_tab = ""
 
@@ -142,32 +146,35 @@ def datain(exp_mode, tries):
     sout_decoded = str(sout).split(";")
     # 0; in1; in2; mode
     print(sout_decoded)
-    in1, in2 = float(int(sout_decoded[1])/1000), float(int(sout_decoded[2])/1000)
-    while True:
-        # tạo input box trống -> đặt key -> update nội dung theo key
-        # dùng hàm ngoài để parse công thức
-        layout = [
-            [sg.Text(f"Nhập dữ liệu còn thiếu của lần đo thứ {tries}:",  background_color='#eeeeee', text_color='#000')],
-            [sg.Text(f"Dữ liệu thời gian từ bộ đo: [{in1}], [{in2}] (ms)",  background_color='#eeeeee', text_color='#000')],
-            [sg.Text("m1:                   ",  background_color='#eeeeee', text_color='#000'), sg.InputText( background_color='#fff', text_color='#000', border_width=0)],
-            [sg.Text("m2:                   ",  background_color='#eeeeee', text_color='#000'), sg.InputText( background_color='#fff', text_color='#000', border_width=0)],
-            [sg.Text("Quãng đường: ",  background_color='#eeeeee', text_color='#000'), sg.InputText( background_color='#fff', text_color='#000', border_width=0)],
-            [sg.Submit(button_text="Hoàn tất",  button_color=('#fff', '#000'), bind_return_key=True)]
-        ]
-        win = sg.Window("Nhập dữ liệu đo", layout, finalize=True, background_color='#eeeeee', font=('Arial', 14), keep_on_top=True)
-        e, v = win.read()
-        win.close()
-        if (v[0] != "" and v[1] != "" and v[2] != ""): 
-            break
-        else: sg.Popup("Các ô dữ liệu không được để trống!", title="Chú ý", background_color='#eeeeee', text_color='#000', button_color=('#fff', '#000'))
+    if (len(sout_decoded) < 2): 
+        return "-1"
+    else:
+        in1, in2 = float(int(sout_decoded[1])/1000), float(int(sout_decoded[2])/1000)
+        while True:
+            # tạo input box trống -> đặt key -> update nội dung theo key
+            # dùng hàm ngoài để parse công thức
+            layout = [
+                [sg.Text(f"Nhập dữ liệu còn thiếu của lần đo thứ {tries}:",  background_color='#eeeeee', text_color='#000')],
+                [sg.Text(f"Dữ liệu thời gian từ bộ đo: [{in1}], [{in2}] (ms)",  background_color='#eeeeee', text_color='#000')],
+                [sg.Text("m1:                   ",  background_color='#eeeeee', text_color='#000'), sg.InputText( background_color='#fff', text_color='#000', border_width=0)],
+                [sg.Text("m2:                   ",  background_color='#eeeeee', text_color='#000'), sg.InputText( background_color='#fff', text_color='#000', border_width=0)],
+                [sg.Text("Quãng đường: ",  background_color='#eeeeee', text_color='#000'), sg.InputText( background_color='#fff', text_color='#000', border_width=0)],
+                [sg.Submit(button_text="Hoàn tất",  button_color=('#fff', '#000'), bind_return_key=True)]
+            ]
+            win = sg.Window("Nhập dữ liệu đo", layout, finalize=True, background_color='#eeeeee', font=('Arial', 14), keep_on_top=True)
+            e, v = win.read()
+            win.close()
+            if (v[0] != "" and v[1] != "" and v[2] != ""): 
+                break
+            else: sg.Popup("Các ô dữ liệu không được để trống!", title="Chú ý", background_color='#eeeeee', text_color='#000', button_color=('#fff', '#000'))
 
-    # m1, m2, s tu nhap
-    m1, m2, s = float(v[0]), float(v[1]), float(v[2])
-    if exp_mode == "elastic":
-        data_elastic.append(datain_elastic(tries, in1, in2, m1, m2, s))
-    elif exp_mode == "inelastic":
-        data_inelastic.append(datain_inelastic(tries, in1, in2, m1, m2, s))
-    
+        # m1, m2, s tu nhap
+        m1, m2, s = float(v[0]), float(v[1]), float(v[2])
+        if exp_mode == "elastic":
+            data_elastic.append(datain_elastic(tries, in1, in2, m1, m2, s))
+        elif exp_mode == "inelastic":
+            data_inelastic.append(datain_inelastic(tries, in1, in2, m1, m2, s))
+        
 
 # gui
 # define menu selections
@@ -242,7 +249,9 @@ layout = [
             sg.Tab('Va chạm mềm', tab_table_inelasitc, background_color='#eeeeee', key='-tab_inelastic-'),
             sg.Tab('Va chạm đàn hồi', tab_table_elasitc, background_color='#eeeeee', key='-tab_elastic-'),
         ]
-    ], expand_x=True, expand_y=True, tab_background_color="#eeeeee", background_color="#eeeeee", key="-tg-")]
+    ], expand_x=True, expand_y=True, tab_background_color="#eeeeee", background_color="#eeeeee", key="-tg-")],
+    [sg.Button("Bắt đầu đo", key="-start-")],
+    [sg.StatusBar("Trạng thái đo: Sẵn sàng", key="-status-", text_color="#000", background_color="#eeeeee", relief=sg.RELIEF_FLAT, size=(1, 1), expand_x=True,  justification="left")],
 ]
 
 # tao cua so chuong trinh chinh
@@ -253,6 +262,7 @@ while True:
 
         e, v = win.read(timeout=250)
         tg_tab = v["-tg-"]
+        win["-status-"].update("Trạng thái đo: Sẵn sàng" if not isCounting else "Trạng thái đo: Đang đo")
         if e == sg.WINDOW_CLOSED or e == "Thoát":
             win.close()
             break
@@ -307,20 +317,29 @@ while True:
                     win["-t_elastic-"].update(values=data_elastic)
                 # uwu
                 cfg.close()
+        
+        if e == "-start-":
+            if not isCounting:
+                ser.write("s-ab\n".encode())
+                isCounting = not isCounting
+            else:
+                sg.Popup("Tiến trình đo vẫn đang chạy trên máy đo!", title="Thông báo", background_color='#eeeeee', text_color='#000', button_color=('#fff', '#000'))
 
         if (ser.in_waiting != 0):
             if tg_tab == "-tab_inelastic-": 
                 exp_mode = "inelastic"
-                datain(exp_mode, inelastic_tries)
-                inelastic_tries += 1 
-                win["-t_inelastic-"].update(values=data_inelastic)
-                print(data_inelastic)
+                if (datain(exp_mode, inelastic_tries) != "-1"):
+                    isCounting = False
+                    inelastic_tries += 1 
+                    win["-t_inelastic-"].update(values=data_inelastic)
+                    print(data_inelastic)
             elif tg_tab == "-tab_elastic-": 
                 exp_mode = "elastic"
-                datain(exp_mode, elastic_tries)
-                elastic_tries += 1 
-                win["-t_elastic-"].update(values=data_elastic)
-                print(data_elastic)
+                if (datain(exp_mode, inelastic_tries) != "-1"):
+                    isCounting = False
+                    elastic_tries += 1 
+                    win["-t_elastic-"].update(values=data_elastic)
+                    print(data_elastic)
 
 
     except serial.serialutil.SerialException:
