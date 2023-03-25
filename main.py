@@ -112,12 +112,16 @@ tg_tab = ""
 
 # du lieu cua thi nghiem va cham mem
 inelastic_tries = 1
-data_inelastic = []
+# test data
+data_inelastic = [[1, 0.21, 0.21, 0.179, 0.559, 0.117, 0, 0.117, 0.354, 0.282, 0.118], [2, 0.21, 0.31, 0.179, 0.559, 0.117, 0, 0.117, 0.354, 0.282, 0.147], [3, 0.21, 0.41, 0.179, 0.559, 0.117, 0, 0.117, 0.354, 0.282, 0.175]]
+# data_inelastic = []
 headings_inelastic = ["Lần", "m1", "m2", "t1", "v1", "p1", "p2", "p", "t2'", "v1'=v2'", "p'"]
 
 # du lieu cua thi nghiem va cham dan hoi
 elastic_tries = 1
-data_elastic = []
+# test data
+data_elastic = [[1, 0.21, 0.21, 0, 0, 0.179, 0.354, 0.559, 0.282, 0.117, -0.059], [2, 0.21, 0.31, 0, 0, 0.179, 0.354, 0.559, 0.282, 0.117, -0.087], [3, 0.21, 0.41, 0, 0, 0.179, 0.354, 0.559, 0.282, 0.117, -0.116]]
+# data_elastic = []
 headings_elastic = ["Lần", "m1", "m2", "p1", "p2", "t1'", "t2'", "v1'", "v2'", "p1'", "p'"]
 
 # ham su li thong tin dua vao
@@ -289,7 +293,7 @@ while True:
                 elif event == "Submit":
                     dir = values["-IN2-"]
                     dir = dir + f"/{name}"
-                    export_to_excel(data_inelastic, headings_elastic, data_elastic, headings_elastic, dir)
+                    export_to_excel(data_inelastic, headings_inelastic, data_elastic, headings_elastic, dir)
                     sg.Popup(f"Đã xuất {name} tại đường dẫn {dir}.", title="Hoàn tất", background_color='#eeeeee', text_color='#000', button_color=('#fff', '#000'))
                     break
             exp_win.close()
@@ -335,7 +339,7 @@ while True:
                     print(data_inelastic)
             elif tg_tab == "-tab_elastic-": 
                 exp_mode = "elastic"
-                if (datain(exp_mode, inelastic_tries) != "-1"):
+                if (datain(exp_mode, elastic_tries) != "-1"):
                     isCounting = False
                     elastic_tries += 1 
                     win["-t_elastic-"].update(values=data_elastic)
