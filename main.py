@@ -104,6 +104,10 @@ ser, ser_desc = portselector()
 
 # data
 
+# bien du trang thai chinh sua bang
+global edit
+edit = False
+
 # bien du trang thai may do
 isCounting = False
 
@@ -113,15 +117,15 @@ tg_tab = ""
 # du lieu cua thi nghiem va cham mem
 inelastic_tries = 1
 # test data
-data_inelastic = [[1, 0.21, 0.21, 0.179, 0.559, 0.117, 0, 0.117, 0.354, 0.282, 0.118], [2, 0.21, 0.31, 0.179, 0.559, 0.117, 0, 0.117, 0.354, 0.282, 0.147], [3, 0.21, 0.41, 0.179, 0.559, 0.117, 0, 0.117, 0.354, 0.282, 0.175]]
-# data_inelastic = []
+# data_inelastic = [[1, 0.21, 0.21, 0.179, 0.559, 0.117, 0, 0.117, 0.354, 0.282, 0.118], [2, 0.21, 0.31, 0.179, 0.559, 0.117, 0, 0.117, 0.354, 0.282, 0.147], [3, 0.21, 0.41, 0.179, 0.559, 0.117, 0, 0.117, 0.354, 0.282, 0.175]]
+data_inelastic = []
 headings_inelastic = ["Lần", "m1", "m2", "t1", "v1", "p1", "p2", "p", "t2'", "v1'=v2'", "p'"]
 
 # du lieu cua thi nghiem va cham dan hoi
 elastic_tries = 1
 # test data
-data_elastic = [[1, 0.21, 0.21, 0, 0, 0.179, 0.354, 0.559, 0.282, 0.117, -0.059], [2, 0.21, 0.31, 0, 0, 0.179, 0.354, 0.559, 0.282, 0.117, -0.087], [3, 0.21, 0.41, 0, 0, 0.179, 0.354, 0.559, 0.282, 0.117, -0.116]]
-# data_elastic = []
+# data_elastic = [[1, 0.21, 0.21, 0, 0, 0.179, 0.354, 0.559, 0.282, 0.117, -0.059], [2, 0.21, 0.31, 0, 0, 0.179, 0.354, 0.559, 0.282, 0.117, -0.087], [3, 0.21, 0.41, 0, 0, 0.179, 0.354, 0.559, 0.282, 0.117, -0.116]]
+data_elastic = []
 headings_elastic = ["Lần", "m1", "m2", "p1", "p2", "t1'", "t2'", "v1'", "v2'", "p1'", "p'"]
 
 # ham su li thong tin dua vao
@@ -196,7 +200,8 @@ tab_table_inelasitc = [
         values=data_inelastic, 
         headings=headings_inelastic, 
         key="-t_inelastic-", 
-        auto_size_columns=False, 
+        auto_size_columns=False,
+        def_col_width=8, 
         num_rows=10, 
         justification="center", 
         expand_x=True, 
@@ -213,7 +218,7 @@ tab_table_inelasitc = [
         sbar_arrow_color='#fff', 
         sbar_frame_color='#eeeeee', 
         sbar_relief=sg.RELIEF_FLAT,
-        enable_events=True
+        enable_click_events=True
     )],
 ]
 
@@ -224,6 +229,7 @@ tab_table_elasitc = [
         values=data_elastic, 
         headings=headings_elastic, 
         key="-t_elastic-", 
+        def_col_width=8, 
         auto_size_columns=False,  
         num_rows=10, 
         justification="center", 
@@ -241,7 +247,7 @@ tab_table_elasitc = [
         sbar_arrow_color='#fff', 
         sbar_frame_color='#eeeeee', 
         sbar_relief=sg.RELIEF_FLAT,
-        enable_events=True
+        enable_click_events=True
     )],
 ]
 
@@ -260,6 +266,7 @@ layout = [
 
 # tao cua so chuong trinh chinh
 win = sg.Window(f"Kết quả đo - {ser.name}: {ser_desc}", layout, resizable=True, finalize=True, background_color='#eeeeee')
+# sg.set_options(dpi_awareness=True)
 # main loop
 while True:
     try:
@@ -267,6 +274,8 @@ while True:
         e, v = win.read(timeout=250)
         tg_tab = v["-tg-"]
         win["-status-"].update("Trạng thái đo: Sẵn sàng" if not isCounting else "Trạng thái đo: Đang đo")
+        
+
         if e == sg.WINDOW_CLOSED or e == "Thoát":
             win.close()
             break
