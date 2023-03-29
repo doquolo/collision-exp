@@ -336,7 +336,14 @@ while True:
                 ser.write("s-ab\n".encode())
                 isCounting = not isCounting
             else:
-                sg.Popup("Tiến trình đo vẫn đang chạy trên máy đo!", title="Thông báo", background_color='#eeeeee', text_color='#000', button_color=('#fff', '#000'))
+                layout_1 = [
+                    [sg.Text("Tiến trình đo vẫn đang chạy! Bỏ qua thông báo này? \n Chỉ bỏ qua khi máy gặp sự cố trong lúc vận hành!", background_color='#eeeeee', text_color='#000')],
+                    [sg.Button("Bỏ qua", key="-skip-", button_color=('#fff', '#000')), sg.Button("Tiếp tục đo", key="-cancel-", button_color=('#fff', '#000'))]
+                ]
+                win_noti1 = sg.Window("Thông báo", layout_1, finalize=True, resizable=False, background_color='#eeeeee', font=("Arial", 10))
+                e1, v1 = win_noti1.read()
+                if (e1 == "-skip-"): isCounting = False
+                win_noti1.close()
 
         if (ser.in_waiting != 0):
             if tg_tab == "-tab_inelastic-": 
